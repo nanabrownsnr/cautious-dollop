@@ -8,11 +8,12 @@ from cautious_dollop import __version__
 from cautious_dollop.tools.echo import register_echo
 from cautious_dollop.tools.health_check import register_health_check
 from cautious_dollop.tools.server_info import register_server_info
+from cautious_dollop.tools.task_manager import register_task_manager
 
 SERVER_NAME = "cautious-dollop"
 SERVER_DESCRIPTION = (
     "A production-quality MCP server providing health checks, "
-    "message echoing, and server information tools."
+    "message echoing, server information, and task management tools."
 )
 
 
@@ -47,6 +48,9 @@ def create_server() -> FastMCP:
 
     # Register server info tool
     register_server_info(server)
+
+    # Register task management tool
+    register_task_manager(server)
 
     # Register HTTP health endpoint
     server.custom_route("/health", methods=["GET"])(_health_endpoint)
