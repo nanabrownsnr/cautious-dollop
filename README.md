@@ -1,6 +1,6 @@
 # cautious-dollop
 
-A production-quality MCP (Model Context Protocol) server providing health checks, message echoing, and server information tools.
+A production-quality MCP (Model Context Protocol) server providing health checks, message echoing, server information, and task management tools.
 
 ## Prerequisites
 
@@ -103,10 +103,101 @@ Returns information about this MCP server.
 {
   "service": "cautious-dollop",
   "version": "0.1.0",
-  "description": "A production-quality MCP server providing health checks, message echoing, and server information tools.",
-  "tools": ["echo", "health_check", "server_info"]
+  "description": "A production-quality MCP server providing health checks, message echoing, server information, and task management tools.",
+  "tools": ["create_task", "delete_task", "echo", "health_check", "list_tasks", "server_info", "update_task"]
 }
 ```
+
+### create_task
+
+Creates a new task with the given title, optional description, and priority.
+
+**Parameters:**
+- `title` (string, required): The title of the task.
+- `description` (string, optional): A description of the task.
+- `priority` (string, optional): Task priority - `"low"`, `"medium"`, or `"high"`. Defaults to `"medium"`.
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Implement feature X",
+  "description": "Add support for task management",
+  "priority": "high",
+  "status": "todo",
+  "created_at": "2026-10-17T12:00:00+00:00"
+}
+```
+
+**Validation:** Returns an error if the title is empty or the priority is invalid.
+
+### list_tasks
+
+Lists all tasks with optional filtering by status and priority.
+
+**Parameters:**
+- `status` (string, optional): Filter by status - `"todo"`, `"in_progress"`, or `"done"`.
+- `priority` (string, optional): Filter by priority - `"low"`, `"medium"`, or `"high"`.
+
+**Response:**
+```json
+{
+  "tasks": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "title": "Implement feature X",
+      "description": "Add support for task management",
+      "priority": "high",
+      "status": "todo",
+      "created_at": "2026-10-17T12:00:00+00:00"
+    }
+  ],
+  "count": 1
+}
+```
+
+### update_task
+
+Updates an existing task by ID. At least one field must be provided.
+
+**Parameters:**
+- `id` (string, required): The task ID to update.
+- `title` (string, optional): New title.
+- `description` (string, optional): New description.
+- `priority` (string, optional): New priority - `"low"`, `"medium"`, or `"high"`.
+- `status` (string, optional): New status - `"todo"`, `"in_progress"`, or `"done"`.
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Updated title",
+  "description": "Updated description",
+  "priority": "high",
+  "status": "in_progress",
+  "created_at": "2026-10-17T12:00:00+00:00"
+}
+```
+
+**Validation:** Returns a 404 error if the task does not exist. Returns an error for invalid status or priority values.
+
+### delete_task
+
+Deletes a task by ID.
+
+**Parameters:**
+- `id` (string, required): The task ID to delete.
+
+**Response:**
+```json
+{
+  "deleted": true,
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": "Task '550e8400-e29b-41d4-a716-446655440000' has been successfully deleted."
+}
+```
+
+**Validation:** Returns a 404 error if the task does not exist.
 
 ## Example Tool Calls
 
@@ -150,6 +241,75 @@ Returns information about this MCP server.
   "params": {
     "name": "server_info",
     "arguments": {}
+  }
+}
+```
+
+### Create Task
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 4,
+  "method": "tools/call",
+  "params": {
+    "name": "create_task",
+    "arguments": {
+      "title": "Implement feature X",
+      "description": "Add support for task management",
+      "priority": "high"
+    }
+  }
+}
+```
+
+### List Tasks
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "method": "tools/call",
+  "params": {
+    "name": "list_tasks",
+    "arguments": {
+      "status": "todo",
+      "priority": "high"
+    }
+  }
+}
+```
+
+### Update Task
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 6,
+  "method": "tools/call",
+  "params": {
+    "name": "update_task",
+    "arguments": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "status": "in_progress",
+      "title": "Updated title"
+    }
+  }
+}
+```
+
+### Delete Task
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "method": "tools/call",
+  "params": {
+    "name": "delete_task",
+    "arguments": {
+      "id": "550e8400-e29b-41d4-a716-446655440000"
+    }
   }
 }
 ```
