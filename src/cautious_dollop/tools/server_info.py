@@ -6,8 +6,8 @@ from cautious_dollop import __version__
 
 SERVICE_NAME = "cautious-dollop"
 SERVICE_DESCRIPTION = (
-    "A production-quality MCP server providing health checks, "
-    "message echoing, and server information tools."
+    "A production MCP server providing health checks, "
+    "message echoing, server info, and task management."
 )
 
 

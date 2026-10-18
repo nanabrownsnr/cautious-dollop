@@ -55,3 +55,45 @@ async def test_server_info_response_schema(server):
 async def test_server_info_no_error(server):
     result = await server.call_tool("server_info", {})
     assert result.is_error is False
+
+
+@pytest.mark.asyncio
+async def test_server_info_description_is_concise(server):
+    result = await server.call_tool("server_info", {})
+    desc = result.structured_content["description"]
+    assert len(desc) < 120
+
+
+@pytest.mark.asyncio
+async def test_server_info_description_mentions_capabilities(server):
+    result = await server.call_tool("server_info", {})
+    desc = result.structured_content["description"].lower()
+    assert "health" in desc
+    assert "echo" in desc
+
+
+@pytest.mark.asyncio
+async def test_server_info_includes_all_tools(server):
+    result = await server.call_tool("server_info", {})
+    tools = result.structured_content["tools"]
+    assert "health_check" in tools
+    assert "echo" in tools
+    assert "server_info" in tools
+    assert "create_task" in tools
+    assert "list_tasks" in tools
+    assert "update_task" in tools
+    assert "delete_task" in tools
+
+
+@pytest.mark.asyncio
+async def test_server_info_tools_sorted(server):
+    result = await server.call_tool("server_info", {})
+    tools = result.structured_content["tools"]
+    assert tools == sorted(tools)
+
+
+@pytest.mark.asyncio
+async def test_server_info_description_not_empty_str(server):
+    result = await server.call_tool("server_info", {})
+    desc = result.structured_content["description"]
+    assert desc.strip() == desc
